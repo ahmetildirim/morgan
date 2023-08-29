@@ -1,2 +1,2 @@
 # morgan
-Big news Morgan now on the web
+Morgan is a social media focused on news and discussions
