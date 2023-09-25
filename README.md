@@ -21,3 +21,13 @@ Packages are structured based on the domain driven design. Each package has its 
 user entity, repository, service, handler, and domain layers.
 
 
+## Tools
+
+### Goose
+```bash
+go install github.com/pressly/goose/v3/cmd/goose@latest
+```
+```bash
+goose -dir migrations postgres "user=postgres password=postgres dbname=morgan sslmode=disable host=localhost" up
+```
+```

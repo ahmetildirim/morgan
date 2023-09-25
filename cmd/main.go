@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +9,10 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v5"
+	"morgan.io/config"
+	"morgan.io/internal/auth"
+	"morgan.io/internal/user"
 )
 
 const (
@@ -17,11 +20,30 @@ const (
 )
 
 func main() {
+	cfg := config.New()
+
+	conn, err := pgx.Connect(context.Background(), cfg.ConnectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userRepo := user.NewRepository(conn)
+	userService := user.NewService(userRepo)
+	userHandler := user.NewHandler(userService)
+
+	authService := auth.NewService(userService, cfg.SecretKey)
+	authHandler := auth.NewHandler(authService)
 	r := mux.NewRouter()
+
 	// Add your routes as needed
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	})
+	r.HandleFunc("/v1/users/register", userHandler.CreateUser).Methods(http.MethodPost)
+	r.HandleFunc("/v1/auth/login", authHandler.Login).Methods(http.MethodPost)
+
+	postSubrouter := r.PathPrefix("/v1/posts").Subrouter()
+	postSubrouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	postSubrouter.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello from posts"))
+	}).Methods(http.MethodGet)
 
 	srv := &http.Server{
 		Addr: "0.0.0.0:8080",
