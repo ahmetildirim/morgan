@@ -38,3 +38,24 @@ func (r *repo) FindByFollowerAndFollowee(ctx context.Context, followerID uuid.UU
 
 	return follow, err
 }
+
+func (r *repo) FindByFollower(ctx context.Context, followerID uuid.UUID) ([]*Follow, error) {
+	rows, err := r.conn.Query(ctx, "SELECT id, follower_id, followee_id, created_at FROM follows WHERE follower_id = $1", followerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var follows []*Follow
+	for rows.Next() {
+		follow := &Follow{}
+		err := rows.Scan(&follow.ID, &follow.FollowerID, &follow.FolloweeID, &follow.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		follows = append(follows, follow)
+	}
+
+	return follows, nil
+}

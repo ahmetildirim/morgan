@@ -3,6 +3,8 @@ package follow
 import (
 	"context"
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -47,4 +49,18 @@ func (s *Service) Follow(ctx context.Context, params *CreateFollowServiceParams)
 	}
 
 	return nil
+}
+
+func (s *Service) GetFollowees(ctx context.Context, userID uuid.UUID) ([]uuid.UUID, error) {
+	follows, err := s.repo.FindByFollower(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var followees []uuid.UUID
+	for _, follow := range follows {
+		followees = append(followees, follow.FolloweeID)
+	}
+
+	return followees, nil
 }

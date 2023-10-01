@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -24,4 +25,25 @@ func (r *repo) CreatePost(ctx context.Context, post *Post) error {
 		post.ID, post.OwnerID, post.Content, post.CreatedAt, post.UpdatedAt)
 
 	return err
+}
+
+func (r *repo) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*Post, error) {
+	rows, err := r.conn.Query(ctx, "SELECT id, owner_id, content, created_at, updated_at FROM posts WHERE owner_id = ANY($1)", userIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*Post
+	for rows.Next() {
+		post := &Post{}
+		err := rows.Scan(&post.ID, &post.OwnerID, &post.Content, &post.CreatedAt, &post.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 }

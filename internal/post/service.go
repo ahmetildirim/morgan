@@ -1,6 +1,10 @@
 package post
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type Service struct {
 	repo repository
@@ -22,4 +26,13 @@ func (s *Service) CreatePost(ctx context.Context, params *CreatePostServiceParam
 	}
 
 	return post, nil
+}
+
+func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*Post, error) {
+	posts, err := s.repo.GetPostsByUserIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }

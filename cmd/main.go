@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"morgan.io/config"
 	"morgan.io/internal/auth"
+	"morgan.io/internal/feed"
 	"morgan.io/internal/follow"
 	"morgan.io/internal/post"
 	"morgan.io/internal/user"
@@ -48,6 +49,9 @@ func main() {
 	followService := follow.NewService(followRepo, userService)
 	followHandler := follow.NewHandler(followService)
 
+	feedService := feed.NewService(followService, postService)
+	feedHandler := feed.NewHandler(feedService)
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/v1/users/register", userHandler.CreateUser).Methods(http.MethodPost)
@@ -60,6 +64,10 @@ func main() {
 	followRouter := r.NewRoute().Subrouter()
 	followRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
 	followRouter.HandleFunc("/v1/follows", followHandler.CreateFollow).Methods(http.MethodPost)
+
+	feedRouter := r.NewRoute().Subrouter()
+	feedRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	feedRouter.HandleFunc("/v1/feed", feedHandler.GetFeed).Methods(http.MethodGet)
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",

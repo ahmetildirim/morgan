@@ -1,9 +1,14 @@
 package post
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type repository interface {
 	CreatePost(ctx context.Context, post *Post) error
+	GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*Post, error)
 }
 
 type service interface {

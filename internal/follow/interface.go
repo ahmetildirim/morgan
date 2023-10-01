@@ -10,6 +10,7 @@ import (
 type repository interface {
 	Create(ctx context.Context, follow *Follow) error
 	FindByFollowerAndFollowee(ctx context.Context, followerID uuid.UUID, followeeID uuid.UUID) (*Follow, error)
+	FindByFollower(ctx context.Context, followerID uuid.UUID) ([]*Follow, error)
 }
 
 type service interface {
