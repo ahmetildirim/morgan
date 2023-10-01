@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -29,6 +30,18 @@ func (r *repo) CreateUser(ctx context.Context, user *User) error {
 func (r *repo) FindByEmail(ctx context.Context, email string) (*User, error) {
 	user := &User{}
 	err := r.conn.QueryRow(ctx, "SELECT id, email, hashed_password, created_at, updated_at FROM users WHERE email = $1", email).
+		Scan(&user.ID, &user.Email, &user.HashedPassword, &user.CreatedAt, &user.UpdatedAt)
+
+	if err == pgx.ErrNoRows {
+		return nil, ErrNotFound
+	}
+
+	return user, err
+}
+
+func (r *repo) FindByID(ctx context.Context, id uuid.UUID) (*User, error) {
+	user := &User{}
+	err := r.conn.QueryRow(ctx, "SELECT id, email, hashed_password, created_at, updated_at FROM users WHERE id = $1", id).
 		Scan(&user.ID, &user.Email, &user.HashedPassword, &user.CreatedAt, &user.UpdatedAt)
 
 	if err == pgx.ErrNoRows {

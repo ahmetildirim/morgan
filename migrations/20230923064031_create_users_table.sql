@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 CREATE TABLE users (
     id UUID NOT NULL,
     email VARCHAR(255) NOT NULL,
@@ -8,4 +7,3 @@ CREATE TABLE users (
     updated_at TIMESTAMP NULL,
     PRIMARY KEY (id)
 );
--- +goose StatementEnd

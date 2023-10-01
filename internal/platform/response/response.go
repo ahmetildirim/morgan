@@ -18,6 +18,9 @@ type errorResponse struct {
 
 // Success sends a JSON success response with status code and headers
 func Success(w http.ResponseWriter, statusCode int, data interface{}) {
+	if data == nil {
+		data = struct{}{}
+	}
 	marshaled, err := json.Marshal(data)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err)

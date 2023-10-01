@@ -30,4 +30,7 @@ go install github.com/pressly/goose/v3/cmd/goose@latest
 ```bash
 goose -dir migrations postgres "user=postgres password=postgres dbname=morgan sslmode=disable host=localhost" up
 ```
+Generating migration
+```bash
+goose -dir migrations create create_users_table sql
 ```

@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"errors"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -45,6 +47,15 @@ func (s *Service) Authenticate(ctx context.Context, email string, password strin
 	}
 	if !user.checkPassword(password) {
 		return nil, ErrInvalidPassword
+	}
+
+	return user, nil
+}
+
+func (s *Service) GetUser(ctx context.Context, id uuid.UUID) (*User, error) {
+	user, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
 	}
 
 	return user, nil
