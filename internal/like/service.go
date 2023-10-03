@@ -12,12 +12,14 @@ var (
 )
 
 type Service struct {
-	repo repository
+	repo    repository
+	postSvc postService
 }
 
-func NewService(repo repository) *Service {
+func NewService(repo repository, postSvc postService) *Service {
 	return &Service{
-		repo: repo,
+		repo:    repo,
+		postSvc: postSvc,
 	}
 }
 
@@ -27,7 +29,17 @@ func (s *Service) Create(ctx context.Context, postID, ownerID uuid.UUID) error {
 		return err
 	}
 
-	return s.repo.Create(ctx, like)
+	err = s.repo.Create(ctx, like)
+	if err != nil {
+		return err
+	}
+
+	err = s.postSvc.AddLike(ctx, postID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Service) FindByPostID(ctx context.Context, postID uuid.UUID) ([]*Like, error) {

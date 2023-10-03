@@ -47,3 +47,9 @@ func (r *repo) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*P
 
 	return posts, nil
 }
+
+func (r *repo) AddLike(ctx context.Context, postID uuid.UUID) error {
+	_, err := r.conn.Exec(ctx, "UPDATE posts SET likes = likes + 1 WHERE id = $1", postID)
+
+	return err
+}

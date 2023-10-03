@@ -4,6 +4,7 @@ CREATE TABLE comments (
     post_id UUID NOT NULL,
     owner_id UUID NOT NULL,
     content TEXT NOT NULL,
+    likes INT NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NULL
 );

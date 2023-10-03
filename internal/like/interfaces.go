@@ -11,6 +11,10 @@ type service interface {
 	FindByPostID(ctx context.Context, postID uuid.UUID) ([]*Like, error)
 }
 
+type postService interface {
+	AddLike(ctx context.Context, postID uuid.UUID) error
+}
+
 type repository interface {
 	Create(ctx context.Context, like *Like) error
 	FindByPostID(ctx context.Context, postID uuid.UUID) ([]*Like, error)

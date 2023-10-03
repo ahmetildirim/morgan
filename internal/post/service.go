@@ -36,3 +36,12 @@ func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([
 
 	return posts, nil
 }
+
+func (s *Service) AddLike(ctx context.Context, postID uuid.UUID) error {
+	err := s.repo.AddLike(ctx, postID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

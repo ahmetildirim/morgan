@@ -16,6 +16,7 @@ type Post struct {
 	ID        uuid.UUID
 	OwnerID   uuid.UUID
 	Content   string
+	Likes     int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -30,8 +31,10 @@ func NewPost(ownerID uuid.UUID, content string) (*Post, error) {
 	}
 
 	return &Post{
-		ID:      uuid.New(),
-		OwnerID: ownerID,
-		Content: content,
+		ID:        uuid.New(),
+		OwnerID:   ownerID,
+		Content:   content,
+		Likes:     0,
+		CreatedAt: time.Now(),
 	}, nil
 }

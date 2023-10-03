@@ -59,7 +59,7 @@ func main() {
 	commentHandler := comment.NewHandler(commentService)
 
 	likeRepo := like.NewRepository(conn)
-	likeService := like.NewService(likeRepo)
+	likeService := like.NewService(likeRepo, postService)
 	likeHandler := like.NewHandler(likeService)
 
 	r := mux.NewRouter()
