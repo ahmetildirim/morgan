@@ -7,8 +7,7 @@ import (
 )
 
 type CreateCommentHandlerParams struct {
-	PostID  uuid.UUID `json:"post_id"`
-	Content string    `json:"content"`
+	Content string `json:"content"`
 }
 
 type CreateCommentHandlerResponse struct {

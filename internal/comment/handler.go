@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
@@ -20,6 +22,12 @@ func NewHandler(svc service) *handler {
 }
 
 func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
+	postID, err := uuid.Parse(mux.Vars(r)["post_id"])
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
 	var params CreateCommentHandlerParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
 		response.Error(w, http.StatusBadRequest, err)
@@ -33,7 +41,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	comment, err := h.service.CreateComment(r.Context(), &CreateCommentServiceParams{
-		PostID:  params.PostID,
+		PostID:  postID,
 		OwnerID: userID,
 		Content: params.Content,
 	})

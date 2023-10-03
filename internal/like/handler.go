@@ -1,27 +1,28 @@
-package follow
+package like
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
 
 type handler struct {
-	service service
+	svc service
 }
 
 func NewHandler(svc service) *handler {
 	return &handler{
-		service: svc,
+		svc: svc,
 	}
 }
 
-func (h *handler) CreateFollow(w http.ResponseWriter, r *http.Request) {
-	var params CreateFollowHandlerParams
-	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
+	postID, err := uuid.Parse(mux.Vars(r)["post_id"])
+	if err != nil {
 		response.Error(w, http.StatusBadRequest, err)
 		return
 	}
@@ -32,13 +33,10 @@ func (h *handler) CreateFollow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.service.Follow(r.Context(), &CreateFollowServiceParams{
-		FollowerID: userID,
-		FolloweeID: params.FolloweeID,
-	})
+	err = h.svc.Create(r.Context(), postID, userID)
 	if err != nil {
 		switch err {
-		case ErrFolloweeNotFound, ErrAlreadyFollowing:
+		case ErrPostNotFound:
 			response.Error(w, http.StatusBadRequest, err)
 		default:
 			response.Error(w, http.StatusInternalServerError, err)

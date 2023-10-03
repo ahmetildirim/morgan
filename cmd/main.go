@@ -15,6 +15,7 @@ import (
 	"morgan.io/internal/comment"
 	"morgan.io/internal/feed"
 	"morgan.io/internal/follow"
+	"morgan.io/internal/like"
 	"morgan.io/internal/post"
 	"morgan.io/internal/user"
 )
@@ -57,6 +58,10 @@ func main() {
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService)
 
+	likeRepo := like.NewRepository(conn)
+	likeService := like.NewService(likeRepo)
+	likeHandler := like.NewHandler(likeService)
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/v1/users/register", userHandler.CreateUser).Methods(http.MethodPost)
@@ -76,7 +81,11 @@ func main() {
 
 	commentRouter := r.NewRoute().Subrouter()
 	commentRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
-	commentRouter.HandleFunc("/v1/comments", commentHandler.Create).Methods(http.MethodPost)
+	commentRouter.HandleFunc("/v1/posts/{post_id}/comments", commentHandler.Create).Methods(http.MethodPost)
+
+	likeRouter := r.NewRoute().Subrouter()
+	likeRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	likeRouter.HandleFunc("/v1/posts/{post_id}/likes", likeHandler.Create).Methods(http.MethodPost)
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",
