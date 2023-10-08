@@ -1,0 +1,229 @@
+{
+	"info": {
+		"_postman_id": "73a87a0e-3438-4bd9-8767-4aff97b3af90",
+		"name": "Morgan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27749468"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"u01@gmail.com\",\n    \"password\": \"eeeeeeee\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "0.0.0.0:8080/v1/users/register",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"u01@gmail.com\",\n    \"password\": \"eeeeeeee\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "0.0.0.0:8080/v1/auth/login",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "posts",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFobWV0aWxkaXJpbUBnbWFpbC5jb20iLCJleHAiOjE2OTU4ODEyNDgsImp0aSI6IjQ0OTZiOTFhLWEzZmMtNDhmYi05MDkyLThjYWE4NjQyMDQyMiIsImlhdCI6MTY5NTc5NDg0OCwiaXNzIjoibW9yZ2FuLmlvIn0.OyGXVCAWwBhwJNL48L8SvJq5txTxxYrkxqpuImZshF_IO2QlI9sbPtmclXtJfPtg8-MddtG55QYhz28VZRPT7w",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"content\":\"sdfs sdf sdf sdf sdfsd \"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "0.0.0.0:8080/v1/posts",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "follows",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InUwMUBnbWFpbC5jb20iLCJleHAiOjE2OTYyMjYwNTMsImp0aSI6ImIxNmYwMjhmLTliYTYtNDdmOC04ZmNiLTkyZWEyOGI4NDg2NCIsImlhdCI6MTY5NjEzOTY1MywiaXNzIjoibW9yZ2FuLmlvIn0.5Jeqi9ite9ZuO1mJOWShxrn4Bje-_hxqXl90MRiwvcXJY55b4Iir51fUo27dNeRpj3pWa3XTwKQgmU76QdrDQA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"followee_id\":\"4496b91a-a3fc-48fb-9092-8caa86420422\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "0.0.0.0:8080/v1/follows",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"follows"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "feed",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InUwMUBnbWFpbC5jb20iLCJleHAiOjE2OTYyMjYwNTMsImp0aSI6ImIxNmYwMjhmLTliYTYtNDdmOC04ZmNiLTkyZWEyOGI4NDg2NCIsImlhdCI6MTY5NjEzOTY1MywiaXNzIjoibW9yZ2FuLmlvIn0.5Jeqi9ite9ZuO1mJOWShxrn4Bje-_hxqXl90MRiwvcXJY55b4Iir51fUo27dNeRpj3pWa3XTwKQgmU76QdrDQA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "0.0.0.0:8080/v1/feed",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"feed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "likes",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InUwMUBnbWFpbC5jb20iLCJleHAiOjE2OTYyMjYwNTMsImp0aSI6ImIxNmYwMjhmLTliYTYtNDdmOC04ZmNiLTkyZWEyOGI4NDg2NCIsImlhdCI6MTY5NjEzOTY1MywiaXNzIjoibW9yZ2FuLmlvIn0.5Jeqi9ite9ZuO1mJOWShxrn4Bje-_hxqXl90MRiwvcXJY55b4Iir51fUo27dNeRpj3pWa3XTwKQgmU76QdrDQA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"followee_id\":\"4496b91a-a3fc-48fb-9092-8caa86420422\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "0.0.0.0:8080/v1/comments",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"comments"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
