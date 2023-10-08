@@ -49,5 +49,5 @@ func authenticate(r *http.Request, secret string) (*Claims, error) {
 	// Get bearer token from the Authorization header
 	token := strings.Split(authHeader, "Bearer ")[1]
 
-	return ValidateToken(token, secret)
+	return validateToken(token, secret)
 }

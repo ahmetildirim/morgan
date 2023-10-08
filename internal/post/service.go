@@ -2,16 +2,27 @@ package post
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
+	"morgan.io/internal/like"
+)
+
+var (
+	ErrPostNotFound          = errors.New("post not found")
+	ErrPostLikeAlreadyExists = like.ErrLikeAlreadyExists
 )
 
 type Service struct {
-	repo repository
+	repo        repository
+	likeService likeService
 }
 
-func NewService(repo repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo repository, likeService likeService) *Service {
+	return &Service{
+		repo:        repo,
+		likeService: likeService,
+	}
 }
 
 func (s *Service) CreatePost(ctx context.Context, params *CreatePostServiceParams) (*Post, error) {
@@ -37,8 +48,22 @@ func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([
 	return posts, nil
 }
 
-func (s *Service) AddLike(ctx context.Context, postID uuid.UUID) error {
-	err := s.repo.AddLike(ctx, postID)
+func (s *Service) AddLike(ctx context.Context, postID, userID uuid.UUID) error {
+	err := s.likeService.Create(ctx, postID, userID)
+	if err != nil {
+		return err
+	}
+
+	exists, err := s.repo.Exists(ctx, postID)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return ErrPostNotFound
+	}
+
+	err = s.repo.AddLike(ctx, postID)
 	if err != nil {
 		return err
 	}

@@ -22,6 +22,13 @@ func (r *repo) Create(ctx context.Context, like *Like) error {
 	return err
 }
 
+func (r *repo) Exists(ctx context.Context, postID, ownerID uuid.UUID) (bool, error) {
+	var exists bool
+	err := r.conn.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM likes WHERE post_id = $1 AND owner_id = $2)", postID, ownerID).Scan(&exists)
+
+	return exists, err
+}
+
 func (r *repo) FindByPostID(ctx context.Context, postID uuid.UUID) ([]*Like, error) {
 	rows, err := r.conn.Query(ctx, "SELECT id, post_id, owner_id, created_at, updated_at FROM likes WHERE post_id = $1", postID)
 	if err != nil {

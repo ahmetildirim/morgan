@@ -8,14 +8,14 @@ import (
 	"morgan.io/internal/user"
 )
 
-const expireDuration = 24 * time.Hour
+const expireDuration = 72 * time.Hour
 
 type Claims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func NewAccessToken(user *user.User, secretKey string) (string, error) {
+func newAccessToken(user *user.User, secretKey string) (string, error) {
 	claims := Claims{
 		Email: user.Email,
 		StandardClaims: jwt.StandardClaims{
@@ -34,7 +34,7 @@ func NewAccessToken(user *user.User, secretKey string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateToken(tokenString string, secretKey string) (*Claims, error) {
+func validateToken(tokenString string, secretKey string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) { return []byte(secretKey), nil })
 	if err != nil {
 		return nil, err

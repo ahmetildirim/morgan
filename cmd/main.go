@@ -43,8 +43,11 @@ func main() {
 	authService := auth.NewService(userService, cfg.SecretKey)
 	authHandler := auth.NewHandler(authService)
 
+	likeRepo := like.NewRepository(conn)
+	likeService := like.NewService(likeRepo)
+
 	postRepo := post.NewRepository(conn)
-	postService := post.NewService(postRepo)
+	postService := post.NewService(postRepo, likeService)
 	postHandler := post.NewHandler(postService)
 
 	followRepo := follow.NewRepository(conn)
@@ -58,10 +61,6 @@ func main() {
 	commentService := comment.NewService(commentRepo)
 	commentHandler := comment.NewHandler(commentService)
 
-	likeRepo := like.NewRepository(conn)
-	likeService := like.NewService(likeRepo, postService)
-	likeHandler := like.NewHandler(likeService)
-
 	r := mux.NewRouter()
 
 	r.HandleFunc("/v1/users/register", userHandler.CreateUser).Methods(http.MethodPost)
@@ -70,6 +69,7 @@ func main() {
 	postRouter := r.NewRoute().Subrouter()
 	postRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
 	postRouter.HandleFunc("/v1/posts", postHandler.CreatePost).Methods(http.MethodPost)
+	postRouter.HandleFunc("/v1/posts/{post_id}/likes", postHandler.AddLike).Methods(http.MethodPost)
 
 	followRouter := r.NewRoute().Subrouter()
 	followRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
@@ -85,7 +85,6 @@ func main() {
 
 	likeRouter := r.NewRoute().Subrouter()
 	likeRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
-	likeRouter.HandleFunc("/v1/posts/{post_id}/likes", likeHandler.Create).Methods(http.MethodPost)
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",

@@ -8,18 +8,16 @@ import (
 )
 
 var (
-	ErrPostNotFound = errors.New("post not found")
+	ErrLikeAlreadyExists = errors.New("like already exists")
 )
 
 type Service struct {
-	repo    repository
-	postSvc postService
+	repo repository
 }
 
-func NewService(repo repository, postSvc postService) *Service {
+func NewService(repo repository) *Service {
 	return &Service{
-		repo:    repo,
-		postSvc: postSvc,
+		repo: repo,
 	}
 }
 
@@ -29,19 +27,19 @@ func (s *Service) Create(ctx context.Context, postID, ownerID uuid.UUID) error {
 		return err
 	}
 
+	exists, err := s.repo.Exists(ctx, postID, ownerID)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return ErrLikeAlreadyExists
+	}
+
 	err = s.repo.Create(ctx, like)
 	if err != nil {
 		return err
 	}
 
-	err = s.postSvc.AddLike(ctx, postID)
-	if err != nil {
-		return err
-	}
-
 	return nil
-}
-
-func (s *Service) FindByPostID(ctx context.Context, postID uuid.UUID) ([]*Like, error) {
-	return s.repo.FindByPostID(ctx, postID)
 }

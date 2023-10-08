@@ -20,7 +20,7 @@ func (s Service) Login(ctx context.Context, params *LoginServiceParams) (string,
 		return "", err
 	}
 
-	token, err := NewAccessToken(user, s.secretKey)
+	token, err := newAccessToken(user, s.secretKey)
 	if err != nil {
 		return "", err
 	}
