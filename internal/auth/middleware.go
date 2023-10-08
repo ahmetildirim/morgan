@@ -46,8 +46,10 @@ func authenticate(r *http.Request, secret string) (*Claims, error) {
 		return nil, errors.New("authorization header is empty")
 	}
 
-	// Get bearer token from the Authorization header
-	token := strings.Split(authHeader, "Bearer ")[1]
+	// Get bearer key from the Authorization header
+	key := strings.Split(authHeader, "Bearer ")[1]
 
-	return validateToken(token, secret)
+	token := Token(key)
+
+	return token.Validate(secret)
 }

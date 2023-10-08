@@ -4,7 +4,16 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"morgan.io/internal/post"
 )
+
+type followService interface {
+	GetFollowees(ctx context.Context, userID uuid.UUID) ([]uuid.UUID, error)
+}
+
+type postService interface {
+	GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*post.Post, error)
+}
 
 type Service struct {
 	followSvc followService

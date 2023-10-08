@@ -1,13 +1,23 @@
 package follow
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/google/uuid"
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
+
+type CreateFollowHandlerParams struct {
+	FolloweeID uuid.UUID `json:"followee_id"`
+}
+
+type service interface {
+	Follow(ctx context.Context, params *CreateFollowServiceParams) error
+}
 
 type handler struct {
 	service service

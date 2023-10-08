@@ -1,6 +1,7 @@
 package post
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -10,6 +11,19 @@ import (
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
+
+type CreatePostHandlerParams struct {
+	Content string `json:"content"`
+}
+
+type CreatePostHandlerResponse struct {
+	ID uuid.UUID `json:"id"`
+}
+
+type service interface {
+	CreatePost(ctx context.Context, params *CreatePostServiceParams) (*Post, error)
+	AddLike(ctx context.Context, postID, ownerID uuid.UUID) error
+}
 
 type handler struct {
 	service service

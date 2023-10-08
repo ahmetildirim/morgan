@@ -1,15 +1,33 @@
 package comment
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
+
+type CreateCommentHandlerParams struct {
+	Content string `json:"content"`
+}
+
+type CreateCommentHandlerResponse struct {
+	ID        uuid.UUID `json:"id"`
+	PostID    uuid.UUID `json:"post_id"`
+	OwnerID   uuid.UUID `json:"owner_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type service interface {
+	CreateComment(ctx context.Context, params *CreateCommentServiceParams) (*Comment, error)
+}
 
 type handler struct {
 	service service

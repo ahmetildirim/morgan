@@ -18,9 +18,8 @@ func NewFeed(posts []*post.Post) *Feed {
 
 func mix(posts []*post.Post) []*post.Post {
 	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].CreatedAt.After(posts[j].CreatedAt)
+		return posts[i].Likes > posts[j].Likes && posts[i].CreatedAt.After(posts[j].CreatedAt)
 	})
-	// TODO: sort by likes and comments
 
 	return posts
 }

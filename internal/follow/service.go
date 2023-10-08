@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"morgan.io/internal/user"
+
 	"github.com/google/uuid"
 )
 
@@ -11,6 +13,21 @@ var (
 	ErrFolloweeNotFound = errors.New("followee not found")
 	ErrAlreadyFollowing = errors.New("already following")
 )
+
+type CreateFollowServiceParams struct {
+	FollowerID uuid.UUID
+	FolloweeID uuid.UUID
+}
+
+type repository interface {
+	Create(ctx context.Context, follow *Follow) error
+	FindByFollowerAndFollowee(ctx context.Context, followerID uuid.UUID, followeeID uuid.UUID) (*Follow, error)
+	FindByFollower(ctx context.Context, followerID uuid.UUID) ([]*Follow, error)
+}
+
+type userService interface {
+	GetUser(ctx context.Context, id uuid.UUID) (*user.User, error)
+}
 
 type Service struct {
 	repo    repository

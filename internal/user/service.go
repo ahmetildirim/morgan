@@ -11,6 +11,22 @@ var (
 	ErrEmailAlreadyExists = errors.New("email already exists")
 )
 
+type CreateServiceParams struct {
+	Email    string
+	Password string
+}
+
+type AuthenticateServiceParams struct {
+	Email    string
+	Password string
+}
+
+type repository interface {
+	CreateUser(ctx context.Context, user *User) error
+	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+}
+
 type Service struct {
 	repo repository
 }

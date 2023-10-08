@@ -1,6 +1,20 @@
 package comment
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
+
+type CreateCommentServiceParams struct {
+	PostID  uuid.UUID
+	OwnerID uuid.UUID
+	Content string
+}
+
+type repository interface {
+	Create(ctx context.Context, comment *Comment) error
+}
 
 type Service struct {
 	repo repository

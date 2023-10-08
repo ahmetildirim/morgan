@@ -1,12 +1,30 @@
 package feed
 
 import (
+	"context"
 	"errors"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"morgan.io/internal/platform/reqctx"
 	"morgan.io/internal/platform/response"
 )
+
+type GetFeedHandlerResponse struct {
+	Posts []*GetFeedHandlerResponsePost `json:"posts"`
+}
+
+type GetFeedHandlerResponsePost struct {
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type service interface {
+	GetFeed(ctx context.Context, userID uuid.UUID) (*Feed, error)
+}
 
 type handler struct {
 	svc service

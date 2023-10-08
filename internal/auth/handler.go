@@ -1,11 +1,25 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"morgan.io/internal/platform/response"
 )
+
+type LoginHandlerParams struct {
+	Email    string
+	Password string
+}
+
+type LoginHandlerResponse struct {
+	Token *Token `json:"token"`
+}
+
+type service interface {
+	Login(ctx context.Context, params *LoginServiceParams) (*Token, error)
+}
 
 type Handler struct {
 	service service

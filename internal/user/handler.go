@@ -1,11 +1,26 @@
 package user
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"morgan.io/internal/platform/response"
 )
+
+type CreateUserRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type CreateUserResponse struct {
+	ID string `json:"id"`
+}
+
+type service interface {
+	CreateUser(ctx context.Context, params *CreateServiceParams) (*User, error)
+	Authenticate(ctx context.Context, email string, password string) (*User, error)
+}
 
 type handler struct {
 	svc service

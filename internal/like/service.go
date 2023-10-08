@@ -11,6 +11,15 @@ var (
 	ErrLikeAlreadyExists = errors.New("like already exists")
 )
 
+type postService interface {
+	AddLike(ctx context.Context, postID uuid.UUID) error
+}
+
+type repository interface {
+	Create(ctx context.Context, like *Like) error
+	Exists(ctx context.Context, postID, ownerID uuid.UUID) (bool, error)
+}
+
 type Service struct {
 	repo repository
 }

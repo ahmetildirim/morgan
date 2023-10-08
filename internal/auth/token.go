@@ -10,12 +10,14 @@ import (
 
 const expireDuration = 72 * time.Hour
 
+type Token string
+
 type Claims struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
 }
 
-func newAccessToken(user *user.User, secretKey string) (string, error) {
+func NewToken(user *user.User, secretKey string) (*Token, error) {
 	claims := Claims{
 		Email: user.Email,
 		StandardClaims: jwt.StandardClaims{
@@ -28,14 +30,20 @@ func newAccessToken(user *user.User, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
-		return "Signing Error", err
+		return nil, err
 	}
 
-	return tokenString, nil
+	t := Token(tokenString)
+
+	return &t, nil
 }
 
-func validateToken(tokenString string, secretKey string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) { return []byte(secretKey), nil })
+func (t Token) String() string {
+	return string(t)
+}
+
+func (t Token) Validate(secretKey string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(t.String(), &Claims{}, func(token *jwt.Token) (interface{}, error) { return []byte(secretKey), nil })
 	if err != nil {
 		return nil, err
 	}
