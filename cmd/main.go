@@ -40,7 +40,7 @@ func main() {
 	userService := user.NewService(userRepo)
 	userHandler := user.NewHandler(userService)
 
-	authService := auth.NewService(userService, cfg.SecretKey)
+	authService := auth.NewService(userService, cfg.AuthSecretKey)
 	authHandler := auth.NewHandler(authService)
 
 	likeRepo := like.NewRepository(conn)
@@ -67,24 +67,24 @@ func main() {
 	r.HandleFunc("/v1/auth/login", authHandler.Login).Methods(http.MethodPost)
 
 	postRouter := r.NewRoute().Subrouter()
-	postRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	postRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	postRouter.HandleFunc("/v1/posts", postHandler.CreatePost).Methods(http.MethodPost)
 	postRouter.HandleFunc("/v1/posts/{post_id}/likes", postHandler.AddLike).Methods(http.MethodPost)
 
 	followRouter := r.NewRoute().Subrouter()
-	followRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	followRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	followRouter.HandleFunc("/v1/follows", followHandler.CreateFollow).Methods(http.MethodPost)
 
 	feedRouter := r.NewRoute().Subrouter()
-	feedRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	feedRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	feedRouter.HandleFunc("/v1/feed", feedHandler.GetFeed).Methods(http.MethodGet)
 
 	commentRouter := r.NewRoute().Subrouter()
-	commentRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	commentRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	commentRouter.HandleFunc("/v1/posts/{post_id}/comments", commentHandler.Create).Methods(http.MethodPost)
 
 	likeRouter := r.NewRoute().Subrouter()
-	likeRouter.Use(auth.AuthMiddleware(cfg.SecretKey))
+	likeRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",

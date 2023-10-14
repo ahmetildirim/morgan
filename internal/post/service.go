@@ -65,12 +65,12 @@ func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([
 }
 
 func (s *Service) AddLike(ctx context.Context, postID, userID uuid.UUID) error {
-	err := s.likeService.Create(ctx, postID, userID)
+	exists, err := s.repo.Exists(ctx, postID)
 	if err != nil {
 		return err
 	}
 
-	exists, err := s.repo.Exists(ctx, postID)
+	err = s.likeService.Create(ctx, postID, userID)
 	if err != nil {
 		return err
 	}
