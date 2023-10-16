@@ -12,11 +12,11 @@ import (
 	"github.com/jackc/pgx/v5"
 	"morgan.io/config"
 	"morgan.io/internal/auth"
-	"morgan.io/internal/comment"
 	"morgan.io/internal/feed"
 	"morgan.io/internal/follow"
-	"morgan.io/internal/like"
 	"morgan.io/internal/post"
+	"morgan.io/internal/post/comment"
+	"morgan.io/internal/post/like"
 	"morgan.io/internal/user"
 )
 
@@ -43,11 +43,11 @@ func main() {
 	authService := auth.NewService(userService, cfg.AuthSecretKey)
 	authHandler := auth.NewHandler(authService)
 
+	commentRepo := comment.NewRepository(conn)
 	likeRepo := like.NewRepository(conn)
-	likeService := like.NewService(likeRepo)
 
 	postRepo := post.NewRepository(conn)
-	postService := post.NewService(postRepo, likeService)
+	postService := post.NewService(postRepo, commentRepo, likeRepo)
 	postHandler := post.NewHandler(postService)
 
 	followRepo := follow.NewRepository(conn)
@@ -56,10 +56,6 @@ func main() {
 
 	feedService := feed.NewService(followService, postService)
 	feedHandler := feed.NewHandler(feedService)
-
-	commentRepo := comment.NewRepository(conn)
-	commentService := comment.NewService(commentRepo)
-	commentHandler := comment.NewHandler(commentService)
 
 	r := mux.NewRouter()
 
@@ -70,6 +66,7 @@ func main() {
 	postRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	postRouter.HandleFunc("/v1/posts", postHandler.CreatePost).Methods(http.MethodPost)
 	postRouter.HandleFunc("/v1/posts/{post_id}/likes", postHandler.AddLike).Methods(http.MethodPost)
+	postRouter.HandleFunc("/v1/posts/{post_id}/comments", postHandler.CreateComment).Methods(http.MethodPost)
 
 	followRouter := r.NewRoute().Subrouter()
 	followRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
@@ -78,13 +75,6 @@ func main() {
 	feedRouter := r.NewRoute().Subrouter()
 	feedRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 	feedRouter.HandleFunc("/v1/feed", feedHandler.GetFeed).Methods(http.MethodGet)
-
-	commentRouter := r.NewRoute().Subrouter()
-	commentRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
-	commentRouter.HandleFunc("/v1/posts/{post_id}/comments", commentHandler.Create).Methods(http.MethodPost)
-
-	likeRouter := r.NewRoute().Subrouter()
-	likeRouter.Use(auth.AuthMiddleware(cfg.AuthSecretKey))
 
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",

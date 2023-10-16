@@ -5,15 +5,22 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"morgan.io/internal/like"
+	"morgan.io/internal/post/comment"
+	"morgan.io/internal/post/like"
 )
 
 var (
-	ErrPostNotFound          = errors.New("post not found")
-	ErrPostLikeAlreadyExists = like.ErrLikeAlreadyExists
+	ErrPostNotFound      = errors.New("post not found")
+	ErrLikeAlreadyExists = errors.New("like already exists")
 )
 
 type CreatePostServiceParams struct {
+	OwnerID uuid.UUID
+	Content string
+}
+
+type CreateCommentServiceParams struct {
+	PostID  uuid.UUID
 	OwnerID uuid.UUID
 	Content string
 }
@@ -25,19 +32,26 @@ type repository interface {
 	Exists(ctx context.Context, postID uuid.UUID) (bool, error)
 }
 
-type likeService interface {
-	Create(ctx context.Context, postID, ownerID uuid.UUID) error
+type commentRepository interface {
+	Create(ctx context.Context, comment *comment.Comment) error
+}
+
+type likeRepository interface {
+	Create(ctx context.Context, like *like.Like) error
+	Exists(ctx context.Context, postID, ownerID uuid.UUID) (bool, error)
 }
 
 type Service struct {
 	repo        repository
-	likeService likeService
+	commentRepo commentRepository
+	likeRepo    likeRepository
 }
 
-func NewService(repo repository, likeService likeService) *Service {
+func NewService(repo repository, commentRepo commentRepository, likeRepo likeRepository) *Service {
 	return &Service{
 		repo:        repo,
-		likeService: likeService,
+		commentRepo: commentRepo,
+		likeRepo:    likeRepo,
 	}
 }
 
@@ -55,13 +69,27 @@ func (s *Service) CreatePost(ctx context.Context, params *CreatePostServiceParam
 	return post, nil
 }
 
-func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*Post, error) {
-	posts, err := s.repo.GetPostsByUserIDs(ctx, userIDs)
+func (s *Service) CreateComment(ctx context.Context, params *CreateCommentServiceParams) (*comment.Comment, error) {
+	exists, err := s.repo.Exists(ctx, params.PostID)
 	if err != nil {
 		return nil, err
 	}
 
-	return posts, nil
+	if !exists {
+		return nil, ErrPostNotFound
+	}
+
+	comment, err := comment.NewComment(params.PostID, params.OwnerID, params.Content)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.commentRepo.Create(ctx, comment)
+	if err != nil {
+		return nil, err
+	}
+
+	return comment, nil
 }
 
 func (s *Service) AddLike(ctx context.Context, postID, userID uuid.UUID) error {
@@ -70,19 +98,44 @@ func (s *Service) AddLike(ctx context.Context, postID, userID uuid.UUID) error {
 		return err
 	}
 
-	err = s.likeService.Create(ctx, postID, userID)
-	if err != nil {
-		return err
-	}
-
 	if !exists {
 		return ErrPostNotFound
 	}
 
+	exists, err = s.likeRepo.Exists(ctx, postID, userID)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return ErrLikeAlreadyExists
+	}
+
+	like, err := like.NewLike(postID, userID)
+	if err != nil {
+		return err
+	}
+
+	// create a like record
+	err = s.likeRepo.Create(ctx, like)
+	if err != nil {
+		return err
+	}
+
+	// increment the post's like count
 	err = s.repo.AddLike(ctx, postID)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Service) GetPostsByUserIDs(ctx context.Context, userIDs []uuid.UUID) ([]*Post, error) {
+	posts, err := s.repo.GetPostsByUserIDs(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }
