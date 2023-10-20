@@ -1,36 +1,29 @@
-# morgan
-Morgan is a social media focused on news and discussions
+# morgan-go
 
-[Project board](https://github.com/users/ahmetildirim/projects/1)
+Morgan is a clean architecture example written in Go. It is a side project to learn Go and clean architecture.
 
-[Repository](https://github.com/ahmetildirim/morgan)
+## How to run
 
+### Start Postgres
 
-## Architecture
-    project/
-    ├── cmd/
-    ├── internal/
-    │   ├── user/
-    │   ├── post/
-    │   ├── feed/
-    │   ├── comment/
-    │   ├── reaction/
-    │   ├── platform/
+```bash
+docker-compose up -d
+```
 
-Packages are structured based on the domain driven design. Each package has its own layers. For example, user package has 
-user entity, repository, service, handler, and domain layers.
+### Install Goose
 
-
-## Tools
-
-### Goose
 ```bash
 go install github.com/pressly/goose/v3/cmd/goose@latest
 ```
+
+### Run migrations
+
 ```bash
 goose -dir migrations postgres "user=postgres password=postgres dbname=morgan sslmode=disable host=localhost" up
 ```
-Generating migration
+
+## Run the app
+
 ```bash
-goose -dir migrations create create_users_table sql
+go run cmd/main.go
 ```

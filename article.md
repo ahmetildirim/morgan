@@ -1,54 +1,80 @@
-# Clean Architecture with Golang
+# Idiomatic Clean Architecture with Golang
 
-Ever see a blog post about an architecture, get excited, sit down to implement it, and then realize it detached from reality? In many case, problems they solve are so simple and they fail to draw whole picture.
+Have you ever read a blog post about an architecture, gotten excited, attempted to implement it, only to find it too abstract or disconnected from real-world scenarios? Often, the problems showcased are oversimplified, leaving readers without a comprehensive understanding.
 
-I hope to address this issue by providing a more complete picture of the architecture that can be used in in both simple and complex projects.
+My aim with this post is to present a more holistic view of an architecture suitable for both straightforward and complex projects.
+
+TLWR: Here is the [GitHub repository][repo]
 
 ## Objectives
 
-We need to define the objectives of the architecture before we can start designing it:
+Before delving into the design, it's essential to set the architectural objectives:
 
-- Scalable in terms of code and number of teams working on the project
-- Not a one size fits all solution
+- Scalability in terms of codebase and the number of teams collaborating.
+- Not a one-size-fits-all solution.
 
-## Case Study
+## Case Study: A Social Media App
 
-We will be using a social media application as a case study. It will be similar to Twitter, but with basic use cases:
+To make things tangible, we'll use a rudimentary social media application, similar to  ex Twitter (pun intented).
 
-- Users can register and login
-- Users can post messages
-- Users can follow other users
-- Users can view a feed of messages from users they follow
-- Users can like and comment on messages
+- User registration and login.
+- Posting messages.
+- Following other users.
+- Liking and commenting on posts.
+- Viewing a feed of posts from followed users.
 
-We will implement on the API and only focus on the architecture of the API.
-Many necessary components will be omitted for simplicity, like logging, config management, integration tests, etc.
+The focus will be on the API's architecture. For the sake of clarity, some components like logging, configuration management, and integration tests are omitted.
 
-## Fundamental Reasoning
+## Anatomy of a Package
 
-Go is idiomatic, so it is better to structure the code in a way that complies with the language's idioms.
+While individual packages may vary, most follow this general structure:
 
-What affects our architecture is how encapsulation is done in Go. Unlike classes in other languages, we use packages to encapsulate data and behavior. **That means packages will be created based on the problem they solve, not based on the type of components they contain.**
+```markdown
+📂package
+ ┣ 📜entity.go
+ ┣ 📜handler.go
+ ┣ 📜repo.go
+ ┗ 📜service.go
+```
 
-For example, we will have a package for the user use case, not a package for the user entity and another for the user repository. This is because the user entity and repository are both part of the user use case.
+### handler
+
+Handles HTTP requests by parsing the input, invoking the service, and dispatching the response.
+
+### service
+
+Houses the business logic. It liaises with the repository and processes data using entities.
+
+### entity
+
+Defines the data structure for the given problem - be it a user, a post, or a comment. It could be a domain or aggregate from Domain Driven Design (DDD) or a simple Data Transfer Object (DTO).
+
+### repository
+
+## Fundamental Reasoning Behind the Structure
+
+Golang is idiomatic, making it imperative to structure the code in sync with its idioms.
+
+The crux of our architecture revolves around Go's encapsulation method. Instead of classes found in many languages, Go employs packages to encapsulate both data and behavior. **This means we structure packages around the problems they address, not the component types they contain.**
+
+For example, we'll have a 'user' package handling user-related use cases, rather than separate packages for user entities and repositories. Both the entity and repository play roles in the user use case.
+
+Have a look at the project structure:
 
 ## Project Structure
 
-``` plain
+```markdown
 📦morgan
  ┣ 📂cmd
+ ┃ ┗ 📜main.go
  ┣ 📂config
+ ┃ ┗ 📜config.go
  ┣ 📂internal
  ┃ ┣ 📂auth
  ┃ ┃ ┣ 📜handler.go
  ┃ ┃ ┣ 📜middleware.go
  ┃ ┃ ┣ 📜service.go
  ┃ ┃ ┗ 📜token.go
- ┃ ┣ 📂comment
- ┃ ┃ ┣ 📜comment.go
- ┃ ┃ ┣ 📜handler.go
- ┃ ┃ ┣ 📜repo.go
- ┃ ┃ ┗ 📜service.go
  ┃ ┣ 📂feed
  ┃ ┃ ┣ 📜feed.go
  ┃ ┃ ┣ 📜handler.go
@@ -58,11 +84,13 @@ For example, we will have a package for the user use case, not a package for the
  ┃ ┃ ┣ 📜handler.go
  ┃ ┃ ┣ 📜repo.go
  ┃ ┃ ┗ 📜service.go
- ┃ ┣ 📂like
- ┃ ┃ ┣ 📜like.go
- ┃ ┃ ┣ 📜repo.go
- ┃ ┃ ┗ 📜service.go
  ┃ ┣ 📂post
+ ┃ ┃ ┣ 📂comment
+ ┃ ┃ ┃ ┣ 📜comment.go
+ ┃ ┃ ┃ ┗ 📜repo.go
+ ┃ ┃ ┣ 📂like
+ ┃ ┃ ┃ ┣ 📜like.go
+ ┃ ┃ ┃ ┗ 📜repo.go
  ┃ ┃ ┣ 📜handler.go
  ┃ ┃ ┣ 📜post.go
  ┃ ┃ ┣ 📜repo.go
@@ -77,35 +105,7 @@ For example, we will have a package for the user use case, not a package for the
  ┣ 📂test
 ```
 
-## Package Anatomy
-
-Most packages will have the following structure, but some may have more or less files depending on the use case:
-
-``` plain
-📂package
- ┣ 📜entity.go
- ┣ 📜handler.go
- ┣ 📜repo.go
- ┗ 📜service.go
-```
-
-### Handler
-
-The handler is the component that handles the HTTP request. It is responsible for parsing the request, calling the service, and returning the response.
-
-### Service
-
-The service is the component that contains the application logic. It is responsible for interacting with the repository and performing the necessary business logic using the entity.
-
-### Entity
-
-The entity is the data structure that represents the problem we are trying to solve. It can be a user, a post, a comment, etc.
-
-It can be a domain or an aggregate from Domain Driven Design (DDD), but it doesn't have to be. It can be a simple data transfer object (DTO).
-
-### Repository
-
-Interacts with the database. It is responsible for persisting and retrieving entities.
+Engages with the database to persist or retrieve entities.
 
 ## Dependency Rule
 
@@ -113,34 +113,23 @@ Each component depends on interfaces it defines. Dependencies are injected into 
 
 ## Cross-Domain Dependencies
 
-Cross-domain dependencies are not done over services. So, if the post service needs the likes domain, it will import the likes service.
+We identify two categories of cross-domain dependencies:
 
-Check the following example from post service:
+1. Dependencies between components within the same bounded context.
+2. Dependencies between components across different bounded contexts.
 
-``` go
-    func (s *Service) AddLike(ctx context.Context, postID, userID uuid.UUID) error {
-        exists, err := s.repo.Exists(ctx, postID)
-        if err != nil {
-            return err
-        }
+The concept of a bounded context originates from DDD. It signifies a perimeter around components sharing a common domain. For instance, 'post', 'comment', and 'like' can be seen as sharing a bounded context due to their strong coupling. If one changes, the others will likely change as well.
 
-        err = s.likeService.Create(ctx, postID, userID)
-        if err != nil {
-            return err
-        }
+In the 'post' package, 'like' and 'comment' entities are accessed via repositories since they share the context. These sub-packages don't need their respective services since they are only used within the 'post' package.
 
-        if !exists {
-            return ErrPostNotFound
-        }
+Conversely, in the 'follow' package, the 'user' domain is accessed using the 'user' service, maintaining domain boundaries without direct repository imports.
 
-        err = s.repo.AddLike(ctx, postID)
-        if err != nil {
-            return err
-        }
+---
 
-        return nil
-    }
-```
+## Conclusion
 
-The **AddLike** service imports the **likeService** and uses it to create a like. This is a cross-domain dependency. The **likeService** interface is defined in the **post** package. The **likeService** implementation is defined in the **like** package.
+The architecture we've explored offers both simplicity and flexibility, making it an ideal choice for many Golang projects. It is definitely not a perfect solution, but it is a good starting point. As your project grows, you can adapt it to suit your needs.
 
+Here is the GitHub repository for the project: [morgan-go][repo]
+
+[repo]: https://github.com/ahmetildirim/morgan

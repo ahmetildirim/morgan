@@ -61,7 +61,7 @@ func (s *Service) Authenticate(ctx context.Context, email string, password strin
 	if err != nil {
 		return nil, err
 	}
-	if !user.checkPassword(password) {
+	if !user.CheckPassword(password) {
 		return nil, ErrInvalidPassword
 	}
 
